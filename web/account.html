@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link href="/jsoneditor/dist/jsoneditor.css" rel="stylesheet" type="text/css">
+    <script src="/jsoneditor/dist/jsoneditor.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <script type="text/javascript" src="/js/app.js"></script>
+    <script type="text/javascript" src="/js/account.js"></script>
+    <title>Configd ::: Account</title>
+</head>
+
+<body ng-app="app">
+    <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">CONFIG'D</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item ">
+                    <a class="nav-link" href="/admin">Configurations</a>
+                </li>
+                <li class=" nav-item active ">
+                    <a class="nav-link " href="/account ">Account <span class="sr-only ">(current)</span></a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link" href="https://github.com/cheikhshift/configd/wiki" target="_blank">Documentation</a>
+                </li>
+            </ul>
+            <div class="form-inline my-2 my-lg-0 ">
+                <a href="/login " class="btn btn-outline-danger my-2 my-sm-0 ">Logout</a>
+            </div>
+        </div>
+    </nav>
+    <br>
+    <br>
+    <div ng-controller="Account" class="container ">
+        <div class="row ">
+            <div class="col-md-7 ">
+                <form ng-submit="updatePassword() ">
+                    <h4>Update password</h4>
+                    <hr>
+                    <input required type="password" class="form-control " placeholder="Current password " ng-model="data.cpassword ">
+                    <br>
+                    <input required type="password" class="form-control " placeholder="New password " ng-model="data.npassword ">
+                    <br>
+                    <button class="btn btn-block btn-info ">Update password</button>
+                </form>
+                <br>
+                <hr>
+                <button class="btn btn-info btn-block " ng-click="deleteAccount() ">Delete account</button>
+            </div>
+           
+        </div>
+    </div>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js " integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo " crossorigin="anonymous "></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js " integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49 " crossorigin="anonymous "></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js " integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em " crossorigin="anonymous "></script>
+    <script src="https://use.fontawesome.com/f989ea00f8.js "></script>
+    <script type="text/javascript " src="/js/sha256.js "></script>
+    <script type="text/javascript " src="/js/sweet-alert.js "></script>
+</body>
+
+</html>

@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gos >
+	<!-- xml docs : http://golangserver.com/docs/markup.html -->
+	<deploy>webapp</deploy>
+	<port>8000</port>
+	<package>if-package-is-library</package>
+	<not_found>/your-404-page</not_found>
+	<error>/your-500-page</error>
+
+	<output>application.go</output>
+	<domain></domain><!-- Cookie domain -->
+	<import src="github.com/cheikhshift/db"/>
+	<import src="github.com/stripe/stripe-go"/>
+	<import src="crypto/sha256" />
+	<import src="github.com/stripe/stripe-go/sub"/>
+	<import src="github.com/stripe/stripe-go/customer"/>
+	<var type="db.DB">dbs</var>
+	<main>	
+	//psss go code here : func main()
+	var err error
+	dbs,err = db.Connect("localhost", "configd")
+		if err != nil {
+			panic(err)
+		}
+	</main>
+	<sh>goimports -w ./</sh>
+
+	<key>a very very very very secret key</key>
+	
+	<header> 
+	</header>
+	<methods>
+		<method name="hash" var="input" return="string">
+			sum := sha256.Sum256([]byte(input.(string)))
+	     	return fmt.Sprintf("%x", sum)
+
+		</method>
+	</methods>
+
+	<templates>
+
+	</templates>
+	<endpoints>
+
+
+
+		<end path="/login" type="POST" >
+			var u User
+		
+			err := Login(r, &u)
+			if err != nil {
+				HandleError(w, err , 404)
+				return true
+			}
+
+			session.Values["userid"] = u.Id.Hex()
+
+			response = mResponse(bson.M{})
+
+		</end>
+
+		<end path="/join" type="POST" >
+			var u User	
+
+			err := Join(r, &u)
+			if err != nil {
+				HandleError(w, err , 400)
+				return true
+			}
+
+			session.Values["userid"] = u.Id.Hex()
+			
+			response = mResponse(bson.M{})
+		</end>
+
+		<end path="/" type="GET" >
+			http.Redirect(w, r, "/login", 301)
+		</end>
+
+		<end path="/logout" type="GET" >
+			if _,ok := session.Values["userid"]; ok {
+				delete(session.Values, "userid")
+			}
+
+			response = mResponse(bson.M{})
+		</end>
+		<end path="/reset" type="POST" >
+			var u User
+			err := ParseBody(r, &u)
+			if err != nil {
+				HandleError(w, err , 400)
+				return true
+			}
+			passw := core.NewLen(6)
+			newPassword :=  Nethash(passw)
+
+			err = ResetPassword(u.Email, newPassword)
+			if err != nil {
+				HandleError(w, err , 500)
+				return true
+			}
+
+			err = SendEmail(u.Email, "Password reset email",fmt.Sprintf( "Hi,\n\n Please use the following password to log into your account :\n🔒Password : %s\n\nThank you for your patience.", passw ) )
+			if err != nil {
+				HandleError(w, err , 404)
+				return true
+			}
+			
+			response = mResponse(bson.M{})
+		</end>
+
+		<end path="/delete_account" type="GET" >
+			
+			var u User
+			var c Configuration
+
+			id := session.Values["userid"].(string)
+
+			err := dbs.Query(u, bson.M{"_id" : bson.ObjectIdHex(id)}).One(&u)
+			if err != nil {
+				HandleError(w,err,500)
+				return true
+			}
+
+			_, err = dbs.RemoveAll(u, bson.M{"_id" : bson.ObjectIdHex(id) })
+			if err != nil {
+				HandleError(w,err,500)
+				return true
+			}
+
+			_, err = dbs.RemoveAll(c, bson.M{"owner" : id })
+
+			if err != nil {
+				HandleError(w,err,500)
+				return true
+			}
+
+			_, _ = sub.Cancel(u.StripeID, nil)
+
+			response = mResponse(bson.M{})
+		</end>
+
+		<end path="/get_configuration" type="f" >
+			if r.Method == "OPTIONS" {
+				return true
+			}
+
+			if r.Method == "GET" {
+				w.Header().Set("Access-Control-Allow-Origin", "*")
+				w.Header().Set("Access-Control-Allow-Headers", "Content-Type,TOKEN")
+			}
+		</end>
+
+		<end path="/get_configuration" type="GET" >
+			if token := r.Header.Get("TOKEN"); token != "" {
+
+				var c Configuration
+
+				err := dbs.Query(c, bson.M{"apikey" : token }).One(&c)
+
+				if err != nil {
+					HandleError(w, err, 401)
+					return
+				}
+
+				c.ApiKey = ""
+
+				response = mResponse(c)
+
+			}
+		</end>
+
+		<end path="/account_status" type="GET" >
+			s := HasSubscribed(session.Values["userid"].(string))
+			if s {
+				response = mResponse(bson.M{})	
+			}
+
+			if !s {
+				err := errors.New("Information not specified!")
+				HandleError(w, err, 500)
+				return true
+			}
+		</end>
+
+		<end path="/process_stripe" type="POST" >
+			if token := r.FormValue("stripeToken"); token != "" {
+			 	id :=  session.Values["userid"].(string)
+			 	params := &stripe.CustomerParams{Description: stripe.String(fmt.Sprintf("Customer for  %s", id))}
+				params.SetSource(token)
+				cus, err := customer.New(params)
+				if err != nil {
+					log.Println(err)
+					http.Redirect(w, r, "/account?error=Error! Please try again", 307)
+					return true
+				}
+				
+
+				paramk := &stripe.SubscriptionParams{Customer: stripe.String(cus.ID), Items: []*stripe.SubscriptionItemsParams{{Plan: stripe.String("configd")}}}
+				s ,err := sub.New(paramk)
+				if err != nil {
+					log.Println(err)
+					http.Redirect(w, r, "/account?error=Error! Please try again", 307)
+					return true
+				}
+
+				var u User
+				subId := s.ID
+
+				err = dbs.Query(u,bson.M{"_id" : bson.ObjectIdHex(id) }).One(&u)
+				if err != nil {
+					log.Println(err)
+					http.Redirect(w, r, "/account?error=Error! Please try again", 307)
+					return true
+				}
+
+				u.StripeID = subId
+
+				dbs.Update(&u)
+
+			 	http.Redirect(w, r, "/account?success=Card information saved!", 307)
+			 	return true
+			}
+		</end>
+
+		<end path="/update_password" type="POST" >
+			var u User
+			err := ParseBody(r, &u)
+			if err != nil {
+				HandleError(w, err , 400)
+				return true
+			}
+
+			err = UpdatePassword(session.Values["userid"].(string) ,u.Email, u.Password)
+			if err != nil {
+				HandleError(w, err , 500)
+				return true
+			}
+			
+			response = mResponse(bson.M{})
+		</end>
+
+  		<end path="/configurations" type="star" >
+  			
+  			if userid,ok := session.Values["userid"].(string); ok {
+
+	  			if r.Method == "GET" {
+	  				var configs []Configuration
+
+	  				err := ListConfigurations(r, userid , &configs)
+	  				if err != nil {
+	  					HandleError(w, err, 500)
+	  					return true
+	  				}
+	  				response = mResponse(configs)
+	  			}
+
+	  			if r.Method == "POST" {
+
+	  				err := AddConfiguration(r, userid)
+	  				if err != nil {
+	  					HandleError(w, err, 500)
+	  					return true
+	  				}
+	  				response = mResponse(bson.M{})
+	  			}
+
+	  			if r.Method == "PUT" {
+	  				err := UpdateConfiguration(r, userid)
+	  				if err != nil {
+	  					HandleError(w, err, 500)
+	  					return true
+	  				}
+	  				response = mResponse(bson.M{})
+	  			}
+
+	  			if r.Method == "DELETE" {
+
+	  				err := DeleteConfiguration(r, userid)
+	  				if err != nil {
+	  					HandleError(w, err, 500)
+	  					return true
+	  				}
+	  				response = mResponse(bson.M{})
+
+	  			}
+  			} else if !ok {
+  				HandleError(w, nil, 401)
+  			}
+  		</end>
+	</endpoints>
+</gos>

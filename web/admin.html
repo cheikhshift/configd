@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link href="/jsoneditor/dist/jsoneditor.css" rel="stylesheet" type="text/css">
+    <script src="/jsoneditor/dist/jsoneditor.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <script type="text/javascript" src="/js/app.js"></script>
+    <script type="text/javascript" src="/js/configurations.js"></script>
+    <title>Configd ::: Admin</title>
+</head>
+
+<body ng-app="app">
+    <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">CONFIG'D</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Configurations<span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/account">Account</a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link" href="https://github.com/cheikhshift/configd/wiki" target="_blank">Documentation</a>
+                </li>
+            </ul>
+            <div class="form-inline my-2 my-lg-0">
+                <a href="/login" class="btn btn-outline-danger my-2 my-sm-0">Logout</a>
+            </div>
+        </div>
+    </nav>
+    <div ng-controller="Configurations" class="row full-size fixed">
+        <div class="container-fluid text-center" ng-if="loading"><i class="fa fa-spin fa-cog"></i> Loading</div>
+        <div class="full-height col-sm-6" ng-if="!current.Id">
+            <div class="list-group">
+                <a href="#" ng-click="add()" class="list-group-item list-group-item-info"><i class="fa fa-plus"></i> New configuration</a>
+                <a ng-repeat="item in items" ng-click="open(item)" href="#" class="list-group-item d-flex justify-content-between align-items-center">
+                   {{ item.Name }}
+                    <span ng-if="item.nodes > 0 " class="badge badge-primary badge-pill">{{ item.nodes }}</span>
+                </a>
+            </div>
+        </div>
+        <div class="full-height  col-sm-9" style="margin-left: 20px;" ng-if="current.Id">
+            <hr style="margin-top: 1em;">
+            <button ng-click="remove(current)" class="btn btn-sm pull-right btn-outline-danger">Delete</button>
+            <button ng-click="close()" type="button" class="btn btn-sm btn-outline-dark">Close</button>
+            <button ng-click="update(current)" type="button" class="btn btn-sm btn-outline-dark">Update</button>
+            <div class="tab-content">
+                <div class="tab-pane active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                    <div id="jsoneditor" style="height: 400px; margin-top: 1.2em;"></div>
+                    <br/>
+                    <input type="text" class="form-control" placeholder="Name" ng-model="current.Name">
+                    <br>
+                    <button type="button" ng-click="modal()" style="margin-bottom: 69px;" class="btn btn-outline-dark">Show API key</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">API Key</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Use this token with the CONFIG'D API.</p>
+                    <pre> <code class="code-target">
+                          
+                          </code> </pre>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
+    <script src="https://use.fontawesome.com/f989ea00f8.js"></script>
+    <script type="text/javascript" src="/js/sha256.js"></script>
+    <script type="text/javascript" src="/js/sweet-alert.js"></script>
+</body>
+
+</html>
