@@ -42,15 +42,6 @@ The server will liston on port 8000 without SSL by default.
 
 	go get github.com/cheikhshift/configd
 
-# Run command
-
-## Add SSL files
-Make sure you have a server key file with name `server.key` in your working directory. 
-
-Make sure you have a server certificate file with name `server.crt` in your working directory. 
-
-	configd
-
 
 ### Packages used :
 - github.com/cheikhshift/gos
