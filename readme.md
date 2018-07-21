@@ -29,13 +29,12 @@ Run the following command to download binary
 
 	configd-server
 
-The server will liston on port 8000 without SSL by default.
+The server will listen on port 8000 without SSL by default.
 
 
 # Requirements (to build)
 
 - Go 1.8+
-- Environment variable Path has `$GOPATH/bin` in it.
 - MongoDB v3.2+
 
 # Get source
