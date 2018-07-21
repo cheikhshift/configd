@@ -4,7 +4,7 @@ Config'd offers configuration management as a service. Read the guide below to s
 
 # Builds
 
-- [Linux Binary](https://github.com/cheikhshift/configd-injector/raw/master/configd-server.tar.gz)
+- [Linux Binary](https://github.com/cheikhshift/configd/raw/master/configd-server.tar.gz)
 	- md5 checksum of binary : 98f2ac5c64be45f61d7c773e97fbc988
 
 # Install binary on linux
