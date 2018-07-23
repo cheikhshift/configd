@@ -18,7 +18,16 @@
 	<main>	
 	//psss go code here : func main()
 	var err error
-	dbs,err = db.Connect("localhost", "configd")
+
+	if MongoURI == "" {
+		MongoURI = "localhost"
+	}
+
+	if MongoDBName == "" { 
+		MongoDBName = "configd"
+	}
+
+	dbs,err = db.Connect(MongoURI, MongoDBName)
 		if err != nil {
 			panic(err)
 		}

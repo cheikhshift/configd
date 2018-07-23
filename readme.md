@@ -41,7 +41,6 @@ The server will listen on port 8000 without SSL by default.
 
 	go get github.com/cheikhshift/configd
 
-
 ### Packages used :
 - github.com/cheikhshift/gos
 - Twitter Bootstrap. 

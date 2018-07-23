@@ -13,6 +13,10 @@ import (
 const trialPeriod int64 = (84600) * 20
 
 var StripeKey string = os.Getenv("STRIPE_SECRET")
+var (
+	MongoURI    string = os.Getenv("CONFIGD_DB_URI")
+	MongoDBName string = os.Getenv("CONFIGD_DB_NAME")
+)
 
 type User struct {
 	Email           string        `valid:"email,unique,required"`
